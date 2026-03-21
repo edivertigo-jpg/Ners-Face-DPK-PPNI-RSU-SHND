@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/x-icon" href="icons/favicon.ico"/>
+  <link rel="shortcut icon" href="icons/favicon.ico"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ners Face – DPK PPNI SHND</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#B71C1C"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="Ners Face"/>
+  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root{
+      --blue:#B71C1C;--dark:#7F0000;--light:#fdecea;
+      --green:#00A86B;--glight:#e6f7f0;
+      --bg:#f0f4f9;--card:#fff;--text:#1c1e21;--muted:#65676b;
+      --border:#dde1e7;--hover:#f2f4f7;--online:#31a24c;
+      --sh:0 2px 8px rgba(0,0,0,.08);--shm:0 4px 20px rgba(0,0,0,.12);--r:12px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* LOADER */
+    #pageLoader{position:fixed;inset:0;background:var(--blue);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10000;transition:opacity .4s;}
+    #pageLoader .lb{width:80px;height:80px;border-radius:20px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-size:44px;font-weight:900;color:#fff;margin-bottom:20px;}
+    #pageLoader h2{color:#fff;font-family:'Nunito',sans-serif;font-size:24px;margin-bottom:6px;}
+    #pageLoader p{color:rgba(255,255,255,.7);font-size:14px;}
+    .dots{display:flex;gap:6px;margin-top:20px;}
+    .dots span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.6);animation:dot .9s infinite;}
+    .dots span:nth-child(2){animation-delay:.15s;}.dots span:nth-child(3){animation-delay:.3s;}
+    @keyframes dot{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1.2);opacity:1}}
+
+    /* TOAST */
+    #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1c1e21;color:#fff;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .3s;z-index:9999;white-space:nowrap;}
+    #toast.show{opacity:1;}
+
+    /* ── AUTH ── */
+    #authScreen{display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--blue) 0%,var(--dark) 100%);align-items:center;justify-content:center;z-index:500;padding:16px;overflow-y:auto;}
+    #authScreen.on{display:flex;}
+    .acard{background:#fff;border-radius:20px;padding:32px 28px;width:420px;max-width:100%;box-shadow:var(--shm);margin:auto;}
+    .alogo{display:flex;align-items:center;gap:10px;margin-bottom:24px;}
+    .alogo .ai{width:44px;height:44px;border-radius:12px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:900;font-family:'Nunito',sans-serif;flex-shrink:0;}
+    .alogo span{font-family:'Nunito',sans-serif;font-size:22px;font-weight:800;color:var(--blue);}
+    .atabs{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:22px;}
+    .atab{flex:1;text-align:center;padding:8px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;}
+    .atab.on{background:#fff;color:var(--blue);box-shadow:var(--sh);}
+    .atab:not(.on){color:var(--muted);}
+    .fg{margin-bottom:13px;}
+    .fg label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:5px;}
+    .fg input,.fg select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:.2s;background:#fff;}
+    .fg input:focus,.fg select:focus{border-color:var(--blue);}
+    .fg select option[value=""]{color:var(--muted);}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .fg-hint{font-size:11px;color:var(--muted);margin-top:4px;}
+    .btnp{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;font-family:inherit;margin-top:6px;}
+    .btnp:hover{background:var(--dark);}
+    .btnp:disabled{opacity:.6;cursor:not-allowed;}
+    .or-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--muted);font-size:13px;}
+    .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    /* ── NAVBAR ── */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:#fff;border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 16px;box-shadow:0 2px 6px rgba(0,0,0,.06);}
+    .nleft{display:flex;align-items:center;gap:10px;flex:1;}
+    .nlogo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+    .nlogo .ni{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--dark));display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:900;font-family:'Nunito',sans-serif;}
+    .nlogo span{font-family:'Nunito',sans-serif;font-weight:800;font-size:20px;color:var(--blue);}
+    .swrap{position:relative;}
+    .swrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;}
+    .nsearch{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:8px 16px 8px 36px;font-size:14px;outline:none;width:220px;transition:.2s;font-family:inherit;}
+    .nsearch:focus{border-color:var(--blue);width:260px;}
+    .ncenter{display:flex;gap:4px;}
+    .ntab{padding:8px 28px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:22px;transition:.15s;border:none;background:transparent;position:relative;}
+    .ntab:hover{background:var(--hover);color:var(--blue);}
+    .ntab.on{color:var(--blue);}
+    .ntab.on::after{content:'';position:absolute;bottom:-10px;left:0;right:0;height:3px;background:var(--blue);border-radius:3px 3px 0 0;}
+    .nright{flex:1;display:flex;justify-content:flex-end;align-items:center;gap:8px;}
+    .nbtn{width:38px;height:38px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text);position:relative;transition:.15s;}
+    .nbtn:hover{background:var(--hover);}
+    .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;cursor:pointer;flex-shrink:0;user-select:none;}
+
+    /* ── LAYOUT ── */
+    .main{padding-top:72px;display:grid;grid-template-columns:280px 1fr 320px;max-width:1280px;margin:0 auto;min-height:100vh;}
+
+    /* ── SIDEBAR LEFT ── */
+    .sleft{padding:16px 12px;position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto;}
+    .sleft::-webkit-scrollbar{width:0;}
+    .ucard{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;transition:.15s;text-decoration:none;color:var(--text);margin-bottom:4px;}
+    .ucard:hover{background:var(--hover);}
+    .sdiv{border:none;border-top:1px solid var(--border);margin:8px 0;}
+    .si{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:15px;font-weight:600;color:var(--text);transition:.15s;text-decoration:none;}
+    .si:hover{background:var(--hover);}
+    .sic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+    .sic.bl{background:var(--light);color:var(--blue);}
+    .sic.gr{background:var(--glight);color:var(--green);}
+    .sic.rd{background:#fde8ef;color:#e4194a;}
+    .sic.yl{background:#fff7e6;color:#f0a500;}
+    .logoutbtn{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:15px;font-weight:600;color:#e4194a;transition:.15s;border:none;background:transparent;font-family:inherit;width:100%;}
+    .logoutbtn:hover{background:#fde8ef;}
+
+    /* ── FEED ── */
+    .feed{padding:16px 12px;max-width:640px;margin:0 auto;width:100%;}
+    .pbox{background:var(--card);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;box-shadow:var(--sh);border:1px solid var(--border);}
+    .pboxtop{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+    .pinput{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:10px 16px;font-size:15px;color:var(--muted);cursor:pointer;outline:none;font-family:inherit;}
+    .pinput:hover{background:#e9edf3;}
+    .pacts{display:flex;border-top:1px solid var(--border);padding-top:10px;gap:4px;}
+    .pact{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);transition:.15s;}
+    .pact:hover{background:var(--hover);}
+    .pcard{background:var(--card);border-radius:var(--r);margin-bottom:16px;box-shadow:var(--sh);border:1px solid var(--border);overflow:hidden;animation:fi .3s ease;}
+    @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .phead{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;}
+    .pav{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0;}
+    .pmeta strong{font-size:15px;font-weight:700;display:block;}
+    .pmeta span{font-size:12px;color:var(--muted);}
+    .pmeta .unit-badge{display:inline-block;background:var(--light);color:var(--blue);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:4px;}
+    .pmore{margin-left:auto;color:var(--muted);cursor:pointer;padding:6px;border-radius:50%;}
+    .pmore:hover{background:var(--hover);}
+    .pbody{padding:0 16px 10px;font-size:15px;line-height:1.55;white-space:pre-wrap;}
+    .ptag{display:inline-block;margin:8px 16px;background:var(--light);color:var(--blue);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+    .pstats{padding:8px 16px;display:flex;justify-content:space-between;font-size:14px;color:var(--muted);border-bottom:1px solid var(--border);}
+    .pactrow{display:flex;padding:4px 8px;gap:2px;border-bottom:1px solid var(--border);}
+    .rbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:8px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;border:none;background:transparent;font-family:inherit;}
+    .rbtn:hover{background:var(--hover);}
+    .rbtn.liked{color:var(--blue);}
+    .rbtn i{font-size:18px;}
+    .csec{padding:10px 16px;}
+    .cm{display:flex;gap:8px;margin-bottom:10px;}
+    .cav{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+    .cbub{background:var(--bg);border-radius:12px;padding:8px 12px;flex:1;}
+    .cbub strong{font-size:13px;font-weight:700;display:block;margin-bottom:2px;}
+    .cbub p{font-size:14px;line-height:1.4;}
+    .cmeta{font-size:12px;color:var(--muted);margin-top:4px;}
+    .cinrow{display:flex;gap:8px;align-items:center;margin-top:6px;}
+    .cin{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:8px 16px;font-size:14px;outline:none;font-family:inherit;}
+    .cin:focus{border-color:var(--blue);}
+    .csend{width:34px;height:34px;border-radius:50%;background:var(--blue);border:none;color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0;}
+    .csend:hover{background:var(--dark);}
+
+    /* SKELETON */
+    .skel{background:linear-gradient(90deg,#e8edf3 25%,#f5f7fa 50%,#e8edf3 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:8px;}
+    @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .skcard{background:#fff;border-radius:var(--r);padding:16px;margin-bottom:16px;border:1px solid var(--border);}
+    .skl{height:14px;margin-bottom:10px;}.ska{width:42px;height:42px;border-radius:50%;}.skt{height:16px;width:60%;}.skb{height:120px;margin-top:10px;}
+
+    /* EMPTY */
+    .empty{text-align:center;padding:48px 20px;color:var(--muted);}
+    .empty i{font-size:48px;margin-bottom:12px;opacity:.3;}
+
+    /* CONFIG NOTICE */
+    #cfgNotice{background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:14px;display:none;}
+    #cfgNotice strong{color:#856404;display:block;margin-bottom:4px;}
+    #cfgNotice code{background:#ffeeba;padding:2px 6px;border-radius:4px;font-size:13px;}
+
+    /* MODAL POST */
+    .moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;}
+    .moverlay.on{display:flex;}
+    .modal{background:var(--card);border-radius:14px;width:520px;max-width:95vw;box-shadow:var(--shm);animation:su .2s ease;}
+    @keyframes su{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+    .mhdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+    .mhdr h3{font-size:18px;font-weight:700;}
+    .mclose{width:34px;height:34px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+    .mbody{padding:16px 20px;}
+    .musr{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+    .mta{width:100%;border:none;outline:none;resize:none;font-size:18px;font-family:inherit;color:var(--text);background:transparent;min-height:120px;}
+    .tchips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+    .tchip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:transparent;font-family:inherit;transition:.15s;}
+    .tchip.sel{background:var(--blue);color:#fff;border-color:var(--blue);}
+    .mfoot{border-top:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:flex-end;}
+    .bpost{background:var(--blue);color:#fff;border:none;padding:10px 28px;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;transition:.15s;font-family:inherit;}
+    .bpost:hover{background:var(--dark);}
+    .bpost:disabled{opacity:.5;cursor:not-allowed;}
+
+    /* SIDEBAR RIGHT */
+    .sright{padding:16px 12px;position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto;}
+    .sright::-webkit-scrollbar{width:0;}
+    .widget{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:16px;border:1px solid var(--border);box-shadow:var(--sh);}
+    .wtitle{font-size:17px;font-weight:700;color:var(--text);margin-bottom:12px;}
+    .banner{background:linear-gradient(135deg,var(--blue) 0%,var(--dark) 100%);border-radius:var(--r);padding:16px;color:#fff;margin-bottom:16px;}
+    .banner .btag{font-size:11px;font-weight:700;letter-spacing:1px;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:8px;}
+    .banner h3{font-size:15px;font-weight:700;margin-bottom:4px;}
+    .banner p{font-size:13px;opacity:.85;line-height:1.4;}
+
+    /* PROFIL CARD */
+    .profile-info{background:var(--light);border-radius:10px;padding:12px;margin-top:8px;font-size:13px;}
+    .profile-info .pi-row{display:flex;gap:6px;margin-bottom:6px;align-items:flex-start;}
+    .profile-info .pi-row:last-child{margin-bottom:0;}
+    .profile-info .pi-label{color:var(--muted);font-weight:700;min-width:60px;flex-shrink:0;}
+    .profile-info .pi-val{color:var(--text);font-weight:600;word-break:break-all;}
+
+    /* PWA */
+    #installBanner{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;border-radius:14px;padding:14px 20px;align-items:center;gap:14px;box-shadow:0 6px 24px rgba(0,82,155,.4);z-index:999;max-width:360px;width:90%;}
+
+    @media(max-width:1100px){.main{grid-template-columns:240px 1fr 280px;}}
+    @media(max-width:900px){.main{grid-template-columns:60px 1fr;}.sright{display:none;}.si span,.ucard .info{display:none;}.si{justify-content:center;}.sic{margin:0 auto;}}
+    @media(max-width:600px){.main{grid-template-columns:1fr;}.sleft{display:none;}.ncenter{display:none;}}
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="pageLoader">
+  <div class="lb">NF</div>
+  <h2>Ners Face</h2>
+  <p>DPK PPNI RSU SHND</p>
+  <div class="dots"><span></span><span></span><span></span></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════ -->
+<div id="authScreen" class="on">
+  <div class="acard">
+    <div class="alogo">
+      <div class="ai">NF</div>
+      <span>Ners Face</span>
+    </div>
+    <div class="atabs">
+      <div class="atab on" onclick="switchAuth('login')">Masuk</div>
+      <div class="atab" onclick="switchAuth('reg')">Daftar</div>
+    </div>
+
+    <!-- ── LOGIN ── -->
+    <div id="loginForm">
+      <div class="fg">
+        <label>NIRA atau NIP</label>
+        <input type="text" id="lNira" placeholder="Contoh: 510302700... atau 2007.10.0690"/>
+        <div class="fg-hint">Gunakan NIRA atau NIP sesuai data anggota PPNI</div>
+      </div>
+      <div class="fg">
+        <label>Password</label>
+        <input type="password" id="lPass" placeholder="••••••••"/>
+        <div class="fg-hint">Default password: tanggal lahir (ddmmyyyy) atau No. Hp</div>
+      </div>
+      <button class="btnp" id="lBtn" onclick="doLogin()">
+        <i class="fa fa-right-to-bracket"></i> Masuk
+      </button>
+    </div>
+
+    <!-- ── REGISTER ── -->
+    <div id="regForm" style="display:none;">
+      <!-- Baris 1: Nama Lengkap Beserta Gelar -->
+      <div class="fg">
+        <label>Nama Lengkap Beserta Gelar</label>
+        <input type="text" id="rNama" placeholder="Contoh: Ns. Budi Santoso, S.Kep"/>
+      </div>
+      <!-- Baris 2: Status | Tanggal Lahir -->
+      <div class="frow">
+        <div class="fg">
+          <label>Status</label>
+          <select id="rStatus">
+            <option value="">-- Pilih Status --</option>
+            <option value="Tetap">Tetap</option>
+            <option value="Kontrak">Kontrak</option>
+            <option value="Magang">Magang</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Tanggal Lahir</label>
+          <input type="date" id="rTglLahir"/>
+        </div>
+      </div>
+      <!-- Baris 3: Tanggal Gabung | NIK -->
+      <div class="frow">
+        <div class="fg">
+          <label>Tanggal Gabung</label>
+          <input type="date" id="rTglGabung"/>
+        </div>
+        <div class="fg">
+          <label>NIK</label>
+          <input type="text" id="rNik" placeholder="16 digit NIK"/>
+        </div>
+      </div>
+      <!-- Baris 4: NIP | NIRA -->
+      <div class="frow">
+        <div class="fg">
+          <label>NIP</label>
+          <input type="text" id="rNip" placeholder="Contoh: 2007.10.0690"/>
+        </div>
+        <div class="fg">
+          <label>NIRA</label>
+          <input type="text" id="rNira" placeholder="Nomor NIRA"/>
+        </div>
+      </div>
+      <!-- Unit Kerja -->
+      <div class="fg">
+        <label>Unit Kerja</label>
+        <select id="rUnit">
+          <option value="">-- Pilih Unit --</option>
+          <option value="Komite Keperawatan">Komite Keperawatan</option>
+          <option value="Manajer Keperawatan">Manajer Keperawatan</option>
+          <option value="Poliklinik Mata SHND">Poliklinik Mata SHND</option>
+          <option value="Poliklinik SHND">Poliklinik SHND</option>
+          <option value="RUANG BAYI SHND">RUANG BAYI SHND</option>
+          <option value="Rawat Inap Lantai 1 SHND">Rawat Inap Lantai 1 SHND</option>
+          <option value="Rawat Inap Lantai 2 SHND">Rawat Inap Lantai 2 SHND</option>
+          <option value="Rawat Inap Lantai 3 SHND">Rawat Inap Lantai 3 SHND</option>
+          <option value="Ruang HD SHND">Ruang HD SHND</option>
+          <option value="Ruang IGD SHND">Ruang IGD SHND</option>
+          <option value="Ruang Intensive SHND">Ruang Intensive SHND</option>
+          <option value="Ruang OK SHND">Ruang OK SHND</option>
+          <option value="Ruang VK SHND">Ruang VK SHND</option>
+          <option value="House Clinic">House Clinic</option>
+          <option value="Lainnya">Lainnya (ketik manual)…</option>
+        </select>
+      </div>
+      <!-- Input manual jika "Lainnya" -->
+      <div class="fg" id="unitManualWrap" style="display:none;">
+        <label>Unit Kerja (manual)</label>
+        <input type="text" id="rUnitManual" placeholder="Ketik nama unit kerja Anda"/>
+      </div>
+      <!-- No Hp -->
+      <div class="fg">
+        <label>No. HP</label>
+        <input type="tel" id="rHp" placeholder="08xxxxxxxxxx"/>
+      </div>
+      <!-- Password -->
+      <div class="fg">
+        <label>Password</label>
+        <input type="password" id="rPass" placeholder="Min. 6 karakter"/>
+        <div class="fg-hint">Buat password yang mudah diingat</div>
+      </div>
+      <button class="btnp" id="rBtn" onclick="doRegister()">
+        <i class="fa fa-user-plus"></i> Daftar Sekarang
+      </button>
+    </div>
+
+    <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:16px;">DPK PPNI RSU SHND © 2026</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════ -->
+<div id="appShell" style="display:none;">
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nleft">
+      <a class="nlogo" href="#"><div class="ni">NF</div><span>Ners Face</span></a>
+      <div class="swrap"><i class="fa fa-search"></i><input class="nsearch" placeholder="Cari anggota, postingan…"/></div>
+    </div>
+    <div class="ncenter">
+      <button class="ntab on" title="Beranda"><i class="fa fa-house"></i></button>
+      <button class="ntab" title="Anggota"><i class="fa fa-users"></i></button>
+      <button class="ntab" title="Kegiatan"><i class="fa fa-calendar"></i></button>
+      <button class="ntab" title="Forum"><i class="fa fa-comments"></i></button>
+    </div>
+    <div class="nright">
+      <div class="nbtn"><i class="fa fa-message"></i></div>
+      <div class="av" id="navAv">?</div>
+    </div>
+  </nav>
+
+  <!-- MAIN GRID -->
+  <div class="main">
+    <!-- SIDEBAR LEFT -->
+    <aside class="sleft">
+      <a class="ucard" href="#">
+        <div class="av" id="sideAv" style="width:42px;height:42px;font-size:16px;">?</div>
+        <div class="info">
+          <strong id="sideName" style="font-size:14px;display:block;">–</strong>
+          <span id="sideUnit" style="font-size:12px;color:var(--blue);">–</span>
+        </div>
+      </a>
+      <hr class="sdiv"/>
+      <a class="si" href="#"><div class="sic bl"><i class="fa fa-user-nurse"></i></div><span>Profil Saya</span></a>
+      <a class="si" href="#"><div class="sic gr"><i class="fa fa-users"></i></div><span>Anggota</span></a>
+      <a class="si" href="#"><div class="sic yl"><i class="fa fa-calendar-check"></i></div><span>Kegiatan</span></a>
+      <a class="si" href="#"><div class="sic rd"><i class="fa fa-bookmark"></i></div><span>Tersimpan</span></a>
+      <hr class="sdiv"/>
+      <button class="logoutbtn" onclick="doLogout()">
+        <div class="sic rd" style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fde8ef;flex-shrink:0;">
+          <i class="fa fa-right-from-bracket"></i>
+        </div>
+        <span>Keluar</span>
+      </button>
+    </aside>
+
+    <!-- FEED -->
+    <main class="feed">
+      <div id="cfgNotice">
+        <strong>⚙️ Mode Demo – Konfigurasi Apps Script diperlukan</strong>
+        Edit <code>index.html</code> → cari <code>APPS_SCRIPT_URL</code> → isi URL Web App Anda agar data tersimpan ke Google Sheets.
+      </div>
+      <!-- Post Box -->
+      <div class="pbox">
+        <div class="pboxtop">
+          <div class="av" id="pbAv" style="flex-shrink:0;">?</div>
+          <input class="pinput" placeholder="Apa yang ingin Anda bagikan?" readonly onclick="openModal()"/>
+        </div>
+        <div class="pacts">
+          <div class="pact" onclick="openModal('Kegiatan')"><i class="fa fa-image" style="color:#45bd62;"></i><span>Foto/Video</span></div>
+          <div class="pact" onclick="openModal('Pengumuman')"><i class="fa fa-bullhorn" style="color:var(--blue);"></i><span>Pengumuman</span></div>
+          <div class="pact" onclick="openModal('Edukasi')"><i class="fa fa-book-medical" style="color:#f7b928;"></i><span>Edukasi</span></div>
+        </div>
+      </div>
+      <div id="feedPosts"></div>
+    </main>
+
+    <!-- SIDEBAR RIGHT -->
+    <aside class="sright">
+      <div class="banner">
+        <div class="btag">🏥 Ners Face DPK PPNI SHND</div>
+        <h3>Selamat Datang!</h3>
+        <p>Platform sosial resmi anggota DPK PPNI RSU SHND.</p>
+      </div>
+      <!-- Profil singkat -->
+      <div class="widget" id="profileWidget">
+        <div class="wtitle">👤 Profil Saya</div>
+        <div class="profile-info" id="profileInfo">–</div>
+      </div>
+      <!-- Kegiatan -->
+      <div class="widget">
+        <div class="wtitle">📅 Kegiatan Mendatang</div>
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;">
+          <div style="background:var(--light);color:var(--blue);border-radius:8px;padding:6px 10px;text-align:center;min-width:44px;"><div style="font-size:20px;font-weight:800;line-height:1;">29</div><div style="font-size:11px;font-weight:700;text-transform:uppercase;">Mar</div></div>
+          <div><strong style="font-size:14px;font-weight:700;display:block;">Rapat Anggota Tahunan</strong><span style="font-size:12px;color:var(--muted);">Aula RSUD · 09.00 WITA</span></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <div style="background:var(--light);color:var(--blue);border-radius:8px;padding:6px 10px;text-align:center;min-width:44px;"><div style="font-size:20px;font-weight:800;line-height:1;">05</div><div style="font-size:11px;font-weight:700;text-transform:uppercase;">Apr</div></div>
+          <div><strong style="font-size:14px;font-weight:700;display:block;">Pelatihan BTCLS Batch 3</strong><span style="font-size:12px;color:var(--muted);">Gedung Pelatihan PPNI</span></div>
+        </div>
+      </div>
+      <!-- Anggota Online -->
+      <div class="widget"><div class="wtitle">👥 Anggota</div><div id="onlineUsers" style="font-size:14px;color:var(--muted);">Memuat…</div></div>
+    </aside>
+  </div>
+
+  <!-- MODAL BUAT POST -->
+  <div class="moverlay" id="postModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="mhdr"><h3>Buat Postingan</h3><button class="mclose" onclick="closeModal()">✕</button></div>
+      <div class="mbody">
+        <div class="musr">
+          <div class="av" id="mAv">?</div>
+          <div>
+            <strong id="mName" style="font-size:15px;">–</strong>
+            <div style="font-size:12px;background:var(--bg);padding:2px 8px;border-radius:4px;margin-top:2px;display:inline-block;"><i class="fa fa-earth-asia"></i> Publik</div>
+          </div>
+        </div>
+        <textarea class="mta" id="postContent" placeholder="Apa yang ingin Anda bagikan?"></textarea>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;">Kategori:</div>
+          <div class="tchips">
+            <button class="tchip" onclick="selTag(this,'')">Umum</button>
+            <button class="tchip" onclick="selTag(this,'Pengumuman')">📢 Pengumuman</button>
+            <button class="tchip" onclick="selTag(this,'Edukasi')">📚 Edukasi</button>
+            <button class="tchip" onclick="selTag(this,'Kegiatan')">🎯 Kegiatan</button>
+            <button class="tchip" onclick="selTag(this,'Inspirasi')">💡 Inspirasi</button>
+          </div>
+        </div>
+      </div>
+      <div class="mfoot">
+        <button class="bpost" id="subBtn" onclick="submitPost()">
+          <i class="fa fa-paper-plane"></i> Posting
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PWA INSTALL BANNER -->
+<div id="installBanner">
+  <img src="icons/icon-72.png" style="width:42px;height:42px;border-radius:10px;" alt=""/>
+  <div style="flex:1;"><div style="font-weight:700;font-size:14px;">Install Ners Face</div><div style="font-size:12px;opacity:.85;">Tambahkan ke layar utama HP</div></div>
+  <button id="installBtn" style="background:#fff;color:var(--blue);border:none;padding:8px 14px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">Install</button>
+  <button id="installClose" style="background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer;padding:0 4px;">✕</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+// ╔══════════════════════════════════════════════════╗
+// ║  ✅  Apps Script URL – DPK PPNI RSU SHND        ║
+// ╚══════════════════════════════════════════════════╝
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCQWPjzAa2ujCXxXBLvOY2Dmwe-ZQjD3tgdHPjhwAign6G5kX5jUmCfMBcJXfikT8/exec';
+// Contoh: 'https://script.google.com/macros/s/AKfycbXXXXX/exec'
+
+// ── STATE ────────────────────────────────────────────
+let ME = null, selTag_ = '', liked = new Set();
+
+// ── HELPERS ──────────────────────────────────────────
+const COLORS = [
+  'linear-gradient(135deg,#00529B,#003d75)',
+  'linear-gradient(135deg,#00A86B,#007a4e)',
+  'linear-gradient(135deg,#9b4400,#c85a00)',
+  'linear-gradient(135deg,#7b0099,#a800d4)',
+  'linear-gradient(135deg,#c85a00,#e07000)',
+  'linear-gradient(135deg,#005f7b,#007a9b)',
+];
+const aCol = s => { let h=0; for(let c of(s||'')) h=(h*31+c.charCodeAt(0))&0xffffffff; return COLORS[Math.abs(h)%COLORS.length]; };
+const ini  = n => (n||'?').split(' ').filter(Boolean).map(w=>w[0]).join('').substring(0,2).toUpperCase();
+const esc  = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const ok   = () => APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('GANTI');
+const fmt  = iso => {
+  if(!iso) return '–';
+  const m=Math.floor((Date.now()-new Date(iso))/60000);
+  if(m<1) return 'Baru saja';
+  if(m<60) return m+' mnt lalu';
+  const h=Math.floor(m/60);
+  if(h<24) return h+' jam lalu';
+  return Math.floor(h/24)+' hari lalu';
+};
+
+function toast(msg,d=3000){
+  const e=document.getElementById('toast');
+  e.textContent=msg; e.classList.add('show');
+  setTimeout(()=>e.classList.remove('show'),d);
+}
+
+// ── API ──────────────────────────────────────────────
+async function api(action,params={}){
+  const u=`${APPS_SCRIPT_URL}?action=${action}&`+new URLSearchParams(params);
+  return (await fetch(u)).json();
+}
+async function apiPost(action,body={}){
+  return (await fetch(`${APPS_SCRIPT_URL}?action=${action}`,{method:'POST',body:JSON.stringify(body)})).json();
+}
+
+// ── AUTH ─────────────────────────────────────────────
+function switchAuth(m){
+  document.getElementById('loginForm').style.display = m==='login'?'':'none';
+  document.getElementById('regForm').style.display   = m==='reg'?'':'none';
+  document.querySelectorAll('.atab').forEach((t,i)=>
+    t.classList.toggle('on',(m==='login'&&i===0)||(m==='reg'&&i===1))
+  );
+}
+
+// Unit "Lainnya" — tampilkan input manual
+document.getElementById('rUnit')?.addEventListener('change', function(){
+  document.getElementById('unitManualWrap').style.display = this.value==='Lainnya'?'':'none';
+});
+
+async function doLogin(){
+  const nira = document.getElementById('lNira').value.trim();
+  const pass  = document.getElementById('lPass').value;
+  if(!nira||!pass){ toast('NIRA/NIP dan password wajib diisi'); return; }
+
+  const btn=document.getElementById('lBtn');
+  btn.disabled=true; btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Memproses…';
+
+  try{
+    if(!ok()){
+      // Mode demo
+      ME={id:'demo',nama:'Demo Anggota',unitKerja:'–',nira,nip:'–',status:'–',noHp:'–',avatar:'DA'};
+      startApp(); return;
+    }
+    const d = await apiPost('loginUser',{nira, password:pass});
+    if(d.error){ toast('❌ '+d.error); return; }
+    ME = d.user;
+    ME.avatar = ME.avatar || ini(ME.nama||'');
+    localStorage.setItem('nersface_user', JSON.stringify(ME));
+    startApp();
+  } catch(e){
+    toast('Koneksi gagal – mode demo aktif');
+    ME={id:'demo',nama:'Demo Anggota',unitKerja:'–',nira,nip:'–',status:'–',noHp:'–',avatar:'DA'};
+    startApp();
+  } finally{
+    btn.disabled=false; btn.innerHTML='<i class="fa fa-right-to-bracket"></i> Masuk';
+  }
+}
+
+async function doRegister(){
+  const nama   = document.getElementById('rNama').value.trim();
+  const nip    = document.getElementById('rNip').value.trim();
+  const nira   = document.getElementById('rNira').value.trim();
+  const pass   = document.getElementById('rPass').value;
+  const unitSel= document.getElementById('rUnit').value;
+  const unit   = unitSel==='Lainnya' ? document.getElementById('rUnitManual').value.trim() : unitSel;
+
+  if(!nama)       { toast('Nama lengkap wajib diisi'); return; }
+  if(!nip&&!nira) { toast('NIP atau NIRA wajib diisi'); return; }
+  if(!unit)       { toast('Unit kerja wajib dipilih'); return; }
+  if(!pass||pass.length<6){ toast('Password minimal 6 karakter'); return; }
+
+  const btn=document.getElementById('rBtn');
+  btn.disabled=true; btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Mendaftar…';
+
+  const payload = {
+    nama,
+    nik:        document.getElementById('rNik').value.trim(),
+    nip,
+    nira,
+    unitKerja:  unit,
+    status:     document.getElementById('rStatus').value,
+    tglLahir:   document.getElementById('rTglLahir').value,
+    tglGabung:  document.getElementById('rTglGabung').value,
+    noHp:       document.getElementById('rHp').value.trim(),
+    password:   pass,
+  };
+
+  try{
+    if(!ok()){
+      toast('⚠️ Mode demo – data tidak disimpan ke Sheets');
+      ME={id:'demo', nama, unitKerja:unit, nip, nira, status:payload.status, noHp:payload.noHp, avatar:ini(nama)};
+      startApp(); return;
+    }
+    const d = await apiPost('registerUser', payload);
+    if(d.error){ toast('❌ '+d.error); return; }
+    ME = d.user;
+    localStorage.setItem('nersface_user', JSON.stringify(ME));
+    toast('✅ Registrasi berhasil! Selamat bergabung.');
+    startApp();
+  } catch(e){
+    toast('Gagal mendaftar – coba lagi'); console.error(e);
+  } finally{
+    btn.disabled=false; btn.innerHTML='<i class="fa fa-user-plus"></i> Daftar Sekarang';
+  }
+}
+
+function doLogout(){
+  if(!confirm('Yakin ingin keluar?')) return;
+  localStorage.removeItem('nersface_user'); ME=null;
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('authScreen').classList.add('on');
+  toast('Sampai jumpa! 👋');
+}
+
+// ── START APP ─────────────────────────────────────────
+function startApp(){
+  document.getElementById('authScreen').classList.remove('on');
+  document.getElementById('appShell').style.display='';
+
+  const av  = ME.avatar || ini(ME.nama||'');
+  const col = aCol(ME.nama||'');
+
+  ['navAv','sideAv','pbAv','mAv'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e){ e.textContent=av; e.style.background=col; }
+  });
+
+  const sn=document.getElementById('sideName');  if(sn) sn.textContent = ME.nama||'–';
+  const su=document.getElementById('sideUnit');  if(su) su.textContent = ME.unitKerja||'–';
+  const mn=document.getElementById('mName');     if(mn) mn.textContent = ME.nama||'–';
+
+  // Profil widget sidebar kanan
+  const pi=document.getElementById('profileInfo');
+  if(pi) pi.innerHTML=`
+    <div class="pi-row"><span class="pi-label">Nama</span><span class="pi-val">${esc(ME.nama||'–')}</span></div>
+    <div class="pi-row"><span class="pi-label">Unit</span><span class="pi-val">${esc(ME.unitKerja||'–')}</span></div>
+    <div class="pi-row"><span class="pi-label">NIP</span><span class="pi-val">${esc(ME.nip||'–')}</span></div>
+    <div class="pi-row"><span class="pi-label">NIRA</span><span class="pi-val">${esc(ME.nira||'–')}</span></div>
+    <div class="pi-row"><span class="pi-label">Status</span><span class="pi-val">${esc(ME.status||'–')}</span></div>
+    <div class="pi-row"><span class="pi-label">No. HP</span><span class="pi-val">${esc(ME.noHp||'–')}</span></div>`;
+
+  if(!ok()) document.getElementById('cfgNotice').style.display='block';
+
+  loadFeed();
+  loadUsers();
+}
+
+// ── FEED ─────────────────────────────────────────────
+const skels=()=>Array(3).fill(0).map(()=>`
+  <div class="skcard">
+    <div style="display:flex;gap:10px;margin-bottom:12px;">
+      <div class="skel ska"></div>
+      <div style="flex:1;"><div class="skel skt" style="margin-bottom:8px;"></div><div class="skel skl" style="width:40%;height:10px;"></div></div>
+    </div>
+    <div class="skel skl"></div><div class="skel skl" style="width:80%;"></div><div class="skel skb"></div>
+  </div>`).join('');
+
+const DEMO = [
+  {id:'d1',userId:'dpk',userName:'Ners Face – DPK PPNI SHND',unitKerja:'Pengurus',
+   content:'📢 Rapat Anggota Tahunan DPK PPNI\n\nKepada seluruh anggota, hadir pada:\n📅 Sabtu, 29 Maret 2026\n🕘 09.00 WITA\n📍 Aula RSU SHND\n\nKonfirmasi kehadiran paling lambat 27 Maret 2026.',
+   tag:'Pengumuman',likes:24,createdAt:new Date(Date.now()-7200000).toISOString()},
+  {id:'d2',userId:'u2',userName:'Ns. Sari Andriani, S.Kep',unitKerja:'Ruang Intensive SHND',
+   content:'Alhamdulillah selesai Pelatihan BLS bersama tim ICU! 🏥💪\nSangat bersyukur bisa tingkatkan kompetensi.\nTerima kasih DPK PPNI! #Keperawatan #PPNI',
+   tag:'Kegiatan',likes:17,createdAt:new Date(Date.now()-18000000).toISOString()},
+  {id:'d3',userId:'u3',userName:'Edukasi Keperawatan PPNI',unitKerja:'Komite Keperawatan',
+   content:'💡 Tahukah Anda?\n\nMenurut WHO, perawat mencakup lebih dari 59% tenaga kesehatan global. Mari terus tingkatkan kompetensi dan profesionalisme kita! 🌟',
+   tag:'Edukasi',likes:42,createdAt:new Date(Date.now()-86400000).toISOString()},
+];
+
+async function loadFeed(){
+  const c=document.getElementById('feedPosts'); c.innerHTML=skels();
+  try{
+    if(!ok()){renderPosts(DEMO,c);return;}
+    const d=await api('getPosts',{limit:30});
+    if(d.error) throw new Error(d.error);
+    if(!d.posts?.length){
+      c.innerHTML='<div class="empty"><i class="fa fa-newspaper"></i><p>Belum ada postingan.<br>Jadilah yang pertama berbagi!</p></div>';
+      return;
+    }
+    renderPosts(d.posts,c);
+  }catch(e){renderPosts(DEMO,c);}
+}
+
+function renderPosts(posts,c){ c.innerHTML=posts.map(p=>buildPost(p)).join(''); }
+
+function buildPost(p){
+  const av=ini(p.userName||'?'), col=aCol(p.userName||'?'), isL=liked.has(p.id);
+  return `<div class="pcard" id="post-${p.id}">
+    <div class="phead">
+      <div class="pav" style="background:${col};">${av}</div>
+      <div class="pmeta">
+        <strong>${esc(p.userName||'Anggota')}${p.unitKerja?`<span class="unit-badge">${esc(p.unitKerja)}</span>`:''}</strong>
+        <span><i class="fa fa-earth-asia" style="font-size:11px;"></i> Publik · ${fmt(p.createdAt)}</span>
+      </div>
+      <div class="pmore"><i class="fa fa-ellipsis"></i></div>
+    </div>
+    ${p.tag?`<span class="ptag"><i class="fa fa-tag"></i> ${esc(p.tag)}</span>`:''}
+    <div class="pbody">${esc(p.content||'')}</div>
+    <div class="pstats">
+      <span>👍 <span id="lc-${p.id}">${p.likes||0}</span></span>
+      <span id="cc-${p.id}">0 komentar</span>
+    </div>
+    <div class="pactrow">
+      <button class="rbtn ${isL?'liked':''}" id="lb-${p.id}" onclick="toggleLike('${p.id}')"><i class="fa fa-thumbs-up"></i> Suka</button>
+      <button class="rbtn" onclick="toggleCom('${p.id}')"><i class="fa fa-comment"></i> Komentar</button>
+      <button class="rbtn"><i class="fa fa-share"></i> Bagikan</button>
+    </div>
+    <div class="csec" id="cs-${p.id}" style="display:none;">
+      <div id="cl-${p.id}"></div>
+      <div class="cinrow">
+        <div class="av" style="width:32px;height:32px;font-size:12px;flex-shrink:0;background:${aCol(ME?.nama||'')};">${ME?.avatar||'?'}</div>
+        <input class="cin" placeholder="Tulis komentar…" id="ci-${p.id}" onkeydown="if(event.key==='Enter')sendCom('${p.id}')"/>
+        <button class="csend" onclick="sendCom('${p.id}')"><i class="fa fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function toggleLike(pid){
+  const btn=document.getElementById(`lb-${pid}`), lc=document.getElementById(`lc-${pid}`);
+  const isL=liked.has(pid), cur=parseInt(lc.textContent)||0;
+  if(isL){liked.delete(pid);btn.classList.remove('liked');lc.textContent=cur-1;}
+  else   {liked.add(pid);btn.classList.add('liked');lc.textContent=cur+1;}
+  if(!ok()||ME?.id==='demo') return;
+  try{ await apiPost('toggleLike',{postId:pid,userId:ME.id}); }catch(e){}
+}
+
+async function toggleCom(pid){
+  const s=document.getElementById(`cs-${pid}`);
+  const open=s.style.display!=='none';
+  s.style.display=open?'none':'';
+  if(!open) await loadComs(pid);
+}
+
+async function loadComs(pid){
+  const l=document.getElementById(`cl-${pid}`);
+  l.innerHTML='<div style="font-size:13px;color:var(--muted);padding:4px 0;">Memuat…</div>';
+  try{
+    if(!ok()){l.innerHTML='';return;}
+    const d=await api('getComments',{postId:pid});
+    const cms=d.comments||[];
+    document.getElementById(`cc-${pid}`).textContent=cms.length+' komentar';
+    l.innerHTML=cms.map(c=>`
+      <div class="cm">
+        <div class="cav" style="background:${aCol(c.userName||'')};">${ini(c.userName||'?')}</div>
+        <div><div class="cbub"><strong>${esc(c.userName||'Anggota')}</strong><p>${esc(c.content||'')}</p></div>
+        <div class="cmeta">${fmt(c.createdAt)}</div></div>
+      </div>`).join('')||'<div style="font-size:13px;color:var(--muted);">Belum ada komentar.</div>';
+  }catch(e){l.innerHTML='';}
+}
+
+async function sendCom(pid){
+  const input=document.getElementById(`ci-${pid}`), txt=input.value.trim();
+  if(!txt) return; input.value='';
+  const l=document.getElementById(`cl-${pid}`);
+  const tmp=document.createElement('div'); tmp.className='cm';
+  tmp.innerHTML=`<div class="cav" style="background:${aCol(ME?.nama||'')};">${ME?.avatar||'?'}</div><div><div class="cbub"><strong>${esc(ME?.nama||'Saya')}</strong><p>${esc(txt)}</p></div><div class="cmeta">Baru saja</div></div>`;
+  l.appendChild(tmp);
+  if(!ok()||ME?.id==='demo') return;
+  try{
+    await apiPost('createComment',{postId:pid,content:txt,userId:ME.id,userName:ME.nama});
+    const d=await api('getComments',{postId:pid});
+    document.getElementById(`cc-${pid}`).textContent=(d.comments||[]).length+' komentar';
+  }catch(e){}
+}
+
+// ── BUAT POST ─────────────────────────────────────────
+function openModal(defTag){
+  document.getElementById('postModal').classList.add('on');
+  if(defTag){ document.querySelectorAll('.tchip').forEach(c=>{ if(c.textContent.includes(defTag)) c.click(); }); }
+  setTimeout(()=>document.getElementById('postContent').focus(),100);
+}
+function closeModal(){ document.getElementById('postModal').classList.remove('on'); }
+function selTag(chip,tag){
+  selTag_=tag;
+  document.querySelectorAll('.tchip').forEach(c=>c.classList.remove('sel'));
+  chip.classList.add('sel');
+}
+
+async function submitPost(){
+  const content=document.getElementById('postContent').value.trim();
+  if(!content){ toast('Tulis sesuatu dulu 😊'); return; }
+  const btn=document.getElementById('subBtn');
+  btn.disabled=true; btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Posting…';
+
+  const np={
+    id:'loc-'+Date.now(), userId:ME.id, userName:ME.nama,
+    unitKerja:ME.unitKerja||'', content, tag:selTag_,
+    likes:0, createdAt:new Date().toISOString()
+  };
+
+  const c=document.getElementById('feedPosts');
+  const tmp=document.createElement('div'); tmp.innerHTML=buildPost(np);
+  c.insertBefore(tmp.firstElementChild, c.firstChild);
+  closeModal();
+  document.getElementById('postContent').value=''; selTag_='';
+  document.querySelectorAll('.tchip').forEach(c=>c.classList.remove('sel'));
+
+  if(ok()&&ME.id!=='demo'){
+    try{ const d=await apiPost('createPost',np); if(d.error) toast('⚠️ '+d.error); else toast('✅ Berhasil diposting!'); }
+    catch(e){ toast('⚠️ Gagal simpan ke server'); }
+  } else { toast('✅ Ditampilkan (mode demo)'); }
+
+  btn.disabled=false; btn.innerHTML='<i class="fa fa-paper-plane"></i> Posting';
+}
+
+// ── ANGGOTA ───────────────────────────────────────────
+async function loadUsers(){
+  const c=document.getElementById('onlineUsers');
+  if(!ok()){
+    const demo=['Ns. Sari Andriani','Ns. Budi Wahyono','Ns. Dewi Kartika'];
+    c.innerHTML=demo.map(n=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:6px;border-radius:8px;cursor:pointer;"
+           onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''">
+        <div style="position:relative;">
+          <div class="av" style="width:36px;height:36px;font-size:13px;background:${aCol(n)};">${ini(n)}</div>
+          <div style="position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:var(--online);border:2px solid #fff;"></div>
+        </div>
+        <span style="font-size:14px;font-weight:600;">${n}</span>
+      </div>`).join(''); return;
+  }
+  try{
+    const d=await api('getUsers');
+    const users=(d.users||[]).slice(0,8).filter(u=>u.id!==ME?.id);
+    c.innerHTML=users.length ? users.map(u=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:6px;border-radius:8px;cursor:pointer;"
+           onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''">
+        <div style="position:relative;">
+          <div class="av" style="width:36px;height:36px;font-size:13px;background:${aCol(u.nama||'')};">${u.avatar||ini(u.nama||'?')}</div>
+          <div style="position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:var(--online);border:2px solid #fff;"></div>
+        </div>
+        <span style="font-size:14px;font-weight:600;">${esc(u.nama||'?')}</span>
+      </div>`).join('') : '<span style="font-size:13px;">Belum ada anggota terdaftar.</span>';
+  }catch(e){ c.innerHTML='<span style="font-size:13px;color:var(--muted);">Gagal memuat.</span>'; }
+}
+
+// ── INIT ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  // Sembunyikan loader
+  setTimeout(()=>{
+    const l=document.getElementById('pageLoader');
+    l.style.opacity='0'; setTimeout(()=>l.style.display='none',400);
+  }, 1200);
+
+  // Auto-login dari sesi tersimpan
+  const saved=localStorage.getItem('nersface_user');
+  if(saved){
+    try{ ME=JSON.parse(saved); document.getElementById('authScreen').classList.remove('on'); startApp(); }
+    catch(e){ localStorage.removeItem('nersface_user'); }
+  }
+
+  // Nav tabs
+  document.querySelectorAll('.ntab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      document.querySelectorAll('.ntab').forEach(x=>x.classList.remove('on'));
+      t.classList.add('on');
+    });
+  });
+
+  // Enter key pada login
+  document.getElementById('lPass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  document.getElementById('rPass')?.addEventListener('keydown', e=>{ if(e.key==='Enter') doRegister(); });
+});
+
+// ── PWA ───────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+let dp;
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); dp=e;
+  document.getElementById('installBanner').style.display='flex';
+});
+document.getElementById('installBtn').addEventListener('click', async()=>{
+  document.getElementById('installBanner').style.display='none';
+  dp.prompt(); dp=null;
+});
+document.getElementById('installClose').addEventListener('click',()=>{
+  document.getElementById('installBanner').style.display='none';
+});
+</script>
+</body>
+</html>
