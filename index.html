@@ -25,7 +25,7 @@
     .dots{display:flex;gap:7px;margin-top:22px;}
     .dots span{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.55);animation:dot .9s infinite;}
     .dots span:nth-child(2){animation-delay:.15s;}.dots span:nth-child(3){animation-delay:.3s;}
-    @keyframes dot{0%,80%,100%{transform:scale(.8);opacity:.4}40%{transform:scale(1.3);opacity:1}}
+    @keyframes dot{0%,80%,100%{transform:scale(.8);opacity:.4}40%{transform:scale(1.3);opacity:1}
 
     /* TOAST */
     #toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:#1c1e21;color:#fff;padding:11px 24px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .3s;z-index:9999;max-width:90vw;text-align:center;}
@@ -100,7 +100,7 @@
 
     /* POST CARD */
     .pcard{background:var(--card);border-radius:var(--r);margin-bottom:16px;box-shadow:var(--sh);border:1px solid var(--border);overflow:hidden;animation:fi .3s ease;}
-    @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}
     .phead{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;}
     .pav{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0;}
     .pmeta strong{font-size:15px;font-weight:700;display:block;}
@@ -134,7 +134,7 @@
 
     /* SKELETON */
     .skel{background:linear-gradient(90deg,#e8edf3 25%,#f5f7fa 50%,#e8edf3 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:8px;}
-    @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}
     .skcard{background:#fff;border-radius:var(--r);padding:16px;margin-bottom:16px;border:1px solid var(--border);}
     .skl{height:14px;margin-bottom:10px;}.ska{width:42px;height:42px;border-radius:50%;}.skt{height:16px;width:60%;}.skb{height:120px;margin-top:10px;}
 
@@ -146,7 +146,7 @@
     .moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:16px;}
     .moverlay.on{display:flex;}
     .modal{background:var(--card);border-radius:16px;width:520px;max-width:100%;box-shadow:var(--shm);animation:su .2s ease;max-height:90vh;overflow-y:auto;}
-    @keyframes su{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+    @keyframes su{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}
     .mhdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1;}
     .mhdr h3{font-size:18px;font-weight:700;}
     .mclose{width:34px;height:34px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
@@ -205,9 +205,9 @@
     /* PWA */
     #installBanner{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;border-radius:14px;padding:14px 20px;align-items:center;gap:14px;box-shadow:0 6px 24px rgba(183,28,28,.4);z-index:999;max-width:360px;width:90%;}
 
-    @media(max-width:1100px){.main{grid-template-columns:240px 1fr 280px;}}
-    @media(max-width:900px){.main{grid-template-columns:60px 1fr;}.sright{display:none;}.si span,.ucard .info{display:none;}.si{justify-content:center;}.sic{margin:0 auto;}}
-    @media(max-width:600px){.main{grid-template-columns:1fr;}.sleft{display:none;}.ncenter{display:none;}}
+    @media(max-width:1100px){.main{grid-template-columns:240px 1fr 280px;}
+    @media(max-width:900px){.main{grid-template-columns:60px 1fr;}.sright{display:none;}.si span,.ucard .info{display:none;}.si{justify-content:center;}.sic{margin:0 auto;}
+    @media(max-width:600px){.main{grid-template-columns:1fr;}.sleft{display:none;}.ncenter{display:none;}
   </style>
 </head>
 <body>
@@ -542,7 +542,7 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGkAbcdCrtXHPAT7ASEeGitAUAQyyt5ZK88AMksuuetl2buOhiuoVXUaYAastPNf8r/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxnw9Y0_qQBGWER4qFzQp2wBqb67F5lqsXHJg64g2nT7eXuJ20jBvauCeUi3kZuuhp2/exec';
 
 // ── STATE ────────────────────────────────────────────
 let ME = null, selTag_ = '', liked = new Set(), allUsers = [], allPosts = [];
@@ -621,7 +621,7 @@ function startApp(){
   document.getElementById('authScreen').classList.remove('on');
   document.getElementById('appShell').style.display='';
   const av=ME.avatar||ini(ME.nama||''), col=aCol(ME.nama||'');
-  ['navAv','sideAv','pbAv','mAv'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent=av;e.style.background=col;}});
+  ['navAv','sideAv','pbAv','mAv'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent=av;e.style.background=col;});
   const sn=document.getElementById('sideName');if(sn)sn.textContent=ME.nama||'–';
   const su=document.getElementById('sideUnit');if(su)su.textContent=ME.unitKerja||'–';
   const mn=document.getElementById('mName');if(mn)mn.textContent=ME.nama||'–';
@@ -672,12 +672,12 @@ function buildPost(p){
         <span><i class="fa fa-earth-asia" style="font-size:11px;"></i> Publik · ${fmt(p.createdAt)}</span>
       </div>
       <div style="position:relative;margin-left:auto;">
-        <button class="pmore" onclick="togglePostMenu('menu-${{p.id}}')" ><i class="fa fa-ellipsis"></i></button>
-        <div id="menu-${{p.id}}" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shm);min-width:160px;z-index:10;overflow:hidden;">
-          ${{ME&&(ME.id===p.userId||ME.id==='demo')?`
-          <div onclick="editPost('${{p.id}}')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''"><i class="fa fa-pen" style="color:var(--red);width:16px;margin-right:8px;"></i>Sunting</div>
-          <div onclick="deletePost('${{p.id}}')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#e4194a;" onmouseover="this.style.background='#fde8ef'" onmouseout="this.style.background=''"><i class="fa fa-trash" style="width:16px;margin-right:8px;"></i>Hapus</div>
-          `:'<div style="padding:12px 16px;font-size:14px;color:var(--muted);">Bukan postingan Anda</div>'}}
+        <button class="pmore" onclick="togglePostMenu('menu-${p.id}')" ><i class="fa fa-ellipsis"></i></button>
+        <div id="menu-${p.id}" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shm);min-width:160px;z-index:10;overflow:hidden;">
+          ${ME&&(ME.id===p.userId||ME.id==='demo')?`
+          <div onclick="editPost('${p.id}')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''"><i class="fa fa-pen" style="color:var(--red);width:16px;margin-right:8px;"></i>Sunting</div>
+          <div onclick="deletePost('${p.id}')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#e4194a;" onmouseover="this.style.background='#fde8ef'" onmouseout="this.style.background=''"><i class="fa fa-trash" style="width:16px;margin-right:8px;"></i>Hapus</div>
+          `:'<div style="padding:12px 16px;font-size:14px;color:var(--muted);">Bukan postingan Anda</div>'}
         </div>
       </div>
     </div>
@@ -845,44 +845,101 @@ async function uploadToImgBB(file){
 }
 
 async function submitPost(){
-  const content=document.getElementById('postContent').value.trim();
-  const fileInput=document.getElementById('fileInput');
-  const file=fileInput.files[0];
-  if(!content&&!file){toast('Tulis sesuatu atau pilih foto dulu 😊');return;}
-  
-  const btn=document.getElementById('subBtn');
-  btn.disabled=true;btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Memproses…';
+  const content   = document.getElementById('postContent').value.trim();
+  const fileInput = document.getElementById('fileInput');
+  const file      = fileInput.files[0];
+  if(!content && !file){ toast('Tulis sesuatu atau pilih foto dulu 😊'); return; }
 
-  // Upload gambar jika ada
-  let imageUrl='';
+  const btn = document.getElementById('subBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses…';
+
+  let imageUrl = '';
+
   if(file){
-    document.getElementById('uploadProgress').style.display='block';
+    const progEl = document.getElementById('uploadProgress');
+    const statEl = document.getElementById('uploadStatus');
+    progEl.style.display = 'block';
+    progEl.innerHTML     = '<i class="fa fa-spinner fa-spin"></i> Mengupload ke Drive…';
+
     try{
-      // Base64 untuk simpan ke Sheets (sederhana, cocok untuk foto kecil)
-      imageUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
-    }catch(e){toast('Gagal upload foto');}
-    document.getElementById('uploadProgress').style.display='none';
+      // Konversi file ke base64
+      const base64 = await new Promise(res => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result);
+        r.readAsDataURL(file);
+      });
+
+      if(ok() && ME.id !== 'demo'){
+        // Upload ke Google Drive via Apps Script
+        const up = await apiPost('uploadFile', {
+          base64,
+          fileName: file.name || ('foto_' + Date.now() + '.jpg')
+        });
+
+        if(up.success){
+          imageUrl = up.thumbUrl || up.url;
+          progEl.innerHTML = '✅ Foto berhasil diupload ke Drive!';
+          statEl.textContent = '📎 ' + file.name;
+        } else {
+          progEl.innerHTML = '⚠️ ' + (up.error || 'Gagal upload');
+          // Fallback ke base64 jika Drive gagal
+          imageUrl = base64;
+        }
+      } else {
+        // Mode demo: pakai base64 sementara
+        imageUrl = base64;
+        progEl.innerHTML = '📎 Foto disimpan sementara (mode demo)';
+      }
+    } catch(e){
+      document.getElementById('uploadProgress').innerHTML = '⚠️ Gagal upload foto';
+      console.error(e);
+    }
+
+    setTimeout(() => { progEl.style.display = 'none'; }, 2000);
   }
 
-  const np={id:'loc-'+Date.now(),userId:ME.id,userName:ME.nama,unitKerja:ME.unitKerja||'',content,tag:selTag_,imageUrl,likes:0,createdAt:new Date().toISOString()};
+  const np = {
+    id:        'loc-' + Date.now(),
+    userId:    ME.id,
+    userName:  ME.nama,
+    unitKerja: ME.unitKerja || '',
+    content,
+    tag:       selTag_,
+    imageUrl,
+    likes:     0,
+    createdAt: new Date().toISOString()
+  };
 
   // Tampilkan langsung (optimistic)
-  const c=document.getElementById('feedPosts');
-  const tmp=document.createElement('div');tmp.innerHTML=buildPost(np);
-  c.insertBefore(tmp.firstElementChild,c.firstChild);
+  const c   = document.getElementById('feedPosts');
+  const tmp = document.createElement('div');
+  tmp.innerHTML = buildPost(np);
+  c.insertBefore(tmp.firstElementChild, c.firstChild);
   allPosts.unshift(np);
+
+  // Reset form
   closePostModal();
-  document.getElementById('postContent').value='';
-  fileInput.value='';
-  document.getElementById('previewImg').style.display='none';
-  selTag_='';document.querySelectorAll('.tchip').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('postContent').value = '';
+  fileInput.value = '';
+  document.getElementById('previewImg').style.display = 'none';
+  document.getElementById('uploadProgress').style.display = 'none';
+  selTag_ = '';
+  document.querySelectorAll('.tchip').forEach(c => c.classList.remove('sel'));
 
-  if(ok()&&ME.id!=='demo'){
-    try{const d=await apiPost('createPost',np);if(d.error)toast('⚠️ '+d.error);else toast('✅ Berhasil diposting!');}
-    catch(e){toast('⚠️ Gagal simpan ke server');}
-  }else{toast('✅ Ditampilkan (mode demo)');}
+  // Simpan ke Sheets
+  if(ok() && ME.id !== 'demo'){
+    try{
+      const d = await apiPost('createPost', np);
+      if(d.error) toast('⚠️ ' + d.error);
+      else        toast('✅ Berhasil diposting!');
+    } catch(e){ toast('⚠️ Gagal simpan ke server'); }
+  } else {
+    toast('✅ Ditampilkan (mode demo)');
+  }
 
-  btn.disabled=false;btn.innerHTML='<i class="fa fa-paper-plane"></i> Posting';
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa fa-paper-plane"></i> Posting';
 }
 
 // ── IMAGE VIEWER ──────────────────────────────────────
@@ -900,7 +957,19 @@ async function loadUsers(){
 
 function renderOnline(){
   const c=document.getElementById('onlineUsers');
-  c.innerHTML=(allUsers.slice(0,6).map(u=>`<div style="display:flex;align-items:center;gap:10px;padding:6px;border-radius:8px;cursor:pointer;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''"><div style="position:relative;"><div class="av" style="width:34px;height:34px;font-size:12px;background:${aCol(u.nama||'')};">${ini(u.nama||'?')}</div><div style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:var(--online);border:2px solid #fff;"></div></div><span style="font-size:13px;font-weight:600;">${esc((u.nama||'').split(',')[0])}</span></div>`)).join('');
+  c.innerHTML=allUsers.slice(0,6).map(u=>{
+    const avStyle=u.photoUrl
+      ? `background-image:url(${u.photoUrl});background-size:cover;background-position:center;`
+      : `background:${aCol(u.nama||'')};`;
+    const avText=u.photoUrl?'':ini(u.nama||'?');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:6px;border-radius:8px;cursor:pointer;" onclick="viewMemberProfile(${JSON.stringify(u).replace(/"/g,'&quot;')})" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''">
+      <div style="position:relative;">
+        <div class="av" style="width:34px;height:34px;font-size:12px;${avStyle}">${avText}</div>
+        <div style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:var(--online);border:2px solid #fff;"></div>
+      </div>
+      <span style="font-size:13px;font-weight:600;">${esc((u.nama||'').split(',')[0])}</span>
+    </div>`;
+  }).join('');
 }
 
 function renderMembers(){
@@ -996,7 +1065,7 @@ async function saveProfile(){
   localStorage.setItem('nersface_user',JSON.stringify(ME));
 
   // Update UI
-  ['navAv','sideAv','pbAv','mAv'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent=ME.avatar;e.style.background=aCol(nama);}});
+  ['navAv','sideAv','pbAv','mAv'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent=ME.avatar;e.style.background=aCol(nama);});
   document.getElementById('sideName').textContent=nama;
   document.getElementById('sideUnit').textContent=unit;
   document.getElementById('mName').textContent=nama;
@@ -1016,17 +1085,51 @@ async function saveProfile(){
   closeProfile();
 }
 
-function uploadAvatar(input){
+async function uploadAvatar(input){
   const file=input.files[0];if(!file)return;
+  const avEl=document.getElementById('profileAvBig');
+
+  // Preview lokal dulu
   const reader=new FileReader();
   reader.onload=e=>{
-    const src=e.target.result;
-    document.getElementById('profileAvBig').style.backgroundImage='url('+src+')';
-    document.getElementById('profileAvBig').style.backgroundSize='cover';
-    document.getElementById('profileAvBig').textContent='';
-    toast('✅ Foto profil diperbarui (tersimpan lokal)');
+    avEl.style.backgroundImage='url('+e.target.result+')';
+    avEl.style.backgroundSize='cover';
+    avEl.style.backgroundPosition='center';
+    avEl.textContent='';
   };
   reader.readAsDataURL(file);
+
+  // Upload ke Drive
+  if(ok()&&ME?.id!=='demo'){
+    toast('⏳ Mengupload foto profil…');
+    try{
+      const base64=await new Promise(res=>{
+        const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);
+      });
+      const up=await apiPost('uploadFile',{
+        base64,
+        fileName:'avatar_'+ME.nip+'_'+Date.now()+'.jpg'
+      });
+      if(up.success){
+        // Simpan URL foto profil ke ME dan localStorage
+        ME.photoUrl=up.thumbUrl||up.url;
+        localStorage.setItem('nersface_user',JSON.stringify(ME));
+        // Update avatar display
+        avEl.style.backgroundImage='url('+ME.photoUrl+')';
+        // Simpan ke profil di Sheets
+        await apiPost('updateProfile',{
+          userId:ME.id,nip:ME.nip,nira:ME.nira,
+          nama:ME.nama,unitKerja:ME.unitKerja,
+          noHp:ME.noHp,avatar:ME.avatar,photoUrl:ME.photoUrl
+        });
+        toast('✅ Foto profil berhasil disimpan ke Drive!');
+      } else {
+        toast('⚠️ '+(up.error||'Gagal upload foto'));
+      }
+    }catch(e){toast('⚠️ Gagal upload foto profil');}
+  } else {
+    toast('✅ Foto profil diperbarui (tersimpan lokal)');
+  }
 }
 
 async function changePassword(){
@@ -1181,7 +1284,7 @@ function loadChatHistories() {
 window.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{const l=document.getElementById('pageLoader');l.style.opacity='0';setTimeout(()=>l.style.display='none',400);},1400);
   const saved=localStorage.getItem('nersface_user');
-  if(saved){try{ME=JSON.parse(saved);document.getElementById('authScreen').classList.remove('on');startApp();}catch(e){localStorage.removeItem('nersface_user');}}
+  if(saved){try{ME=JSON.parse(saved);document.getElementById('authScreen').classList.remove('on');startApp();}catch(e){localStorage.removeItem('nersface_user');}
   document.querySelectorAll('.ntab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.ntab').forEach(x=>x.classList.remove('on'));t.classList.add('on');},{passive:true}));
   document.getElementById('lPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 });
