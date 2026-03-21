@@ -662,116 +662,75 @@ function getDemoP(){return[
 function renderPosts(posts,c){c.innerHTML=posts.map(p=>buildPost(p)).join('');}
 
 function buildPost(p){
-  var av    = ini(p.userName||'?');
-  var col   = aCol(p.userName||'?');
+  var av    = ini(p.userName||"?");
+  var col   = aCol(p.userName||"?");
   var isL   = liked.has(p.id);
-  var isOwn = ME && (ME.id === p.userId || ME.id === 'demo');
-  var myAv  = ME ? (ME.avatar || ini(ME.nama||'?')) : '?';
-  var myCol = ME ? aCol(ME.nama||'') : '#ccc';
+  var isOwn = !!(ME && (ME.id === p.userId || ME.id === "demo"));
+  var myAv  = ME ? (ME.avatar || ini(ME.nama||"?")) : "?";
+  var myCol = ME ? aCol(ME.nama||"") : "#ccc";
+  var pid   = p.id;
 
   var imgHtml = p.imageUrl
-    ? '<img class="pimg" src="'+p.imageUrl+'" alt="foto" onclick="openViewer(this.src)"/>'
-    : '';
+    ? "<img class=\"pimg\" src=\"" + p.imageUrl + "\" alt=\"foto\" onclick=\"openViewer(this.src)\"/>"
+    : "";
 
   var tagHtml = p.tag
-    ? '<span class="ptag"><i class="fa fa-tag"></i> '+esc(p.tag)+'</span>'
-    : '';
+    ? "<span class=\"ptag\"><i class=\"fa fa-tag\"></i> " + esc(p.tag) + "</span>"
+    : "";
 
   var unitHtml = p.unitKerja
-    ? '<span class="unit-badge">'+esc(p.unitKerja)+'</span>'
-    : '';
+    ? "<span class=\"unit-badge\">" + esc(p.unitKerja) + "</span>"
+    : "";
 
-  var menuItems = isOwn
-    ? '<div onclick="editPost(''+p.id+''')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''"><i class="fa fa-pen" style="color:var(--red);margin-right:8px;"></i>Sunting</div><div onclick="deletePost(''+p.id+'')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#e4194a;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#fde8ef'" onmouseout="this.style.background=''"><i class="fa fa-trash" style="margin-right:8px;"></i>Hapus</div>'
-    : '<div style="padding:12px 16px;font-size:13px;color:var(--muted);">Bukan postingan Anda</div>';
+  var menuHtml = isOwn
+    ? "<div onclick=\"editPost(this)\" data-pid=\"" + pid + "\" style=\"padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;\" onmouseover=\"this.style.background='var(--hover)'\" onmouseout=\"this.style.background=''\"><i class=\"fa fa-pen\" style=\"color:var(--red);margin-right:8px;\"></i>Sunting</div>"
+    + "<div onclick=\"deletePost(this)\" data-pid=\"" + pid + "\" style=\"padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#e4194a;display:flex;align-items:center;gap:8px;\" onmouseover=\"this.style.background='#fde8ef'\" onmouseout=\"this.style.background=''\"><i class=\"fa fa-trash\" style=\"margin-right:8px;\"></i>Hapus</div>"
+    : "<div style=\"padding:12px 16px;font-size:13px;color:var(--muted);\">Bukan postingan Anda</div>";
 
-  return '<div class="pcard" id="post-'+p.id+'">'
-    +'<div class="phead">'
-    +'<div class="pav" style="background:'+col+';">'+av+'</div>'
-    +'<div class="pmeta"><strong>'+esc(p.userName||'Anggota')+unitHtml+'</strong>'
-    +'<span><i class="fa fa-earth-asia" style="font-size:11px;"></i> Publik &middot; '+fmt(p.createdAt)+'</span></div>'
-    +'<div style="position:relative;margin-left:auto;">'
-    +'<button class="pmore" onclick="togglePostMenu('menu-'+p.id+'')"><i class="fa fa-ellipsis"></i></button>'
-    +'<div id="menu-'+p.id+'" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shm);min-width:160px;z-index:10;overflow:hidden;">'+menuItems+'</div>'
-    +'</div></div>'
-    +tagHtml
-    +'<div class="pbody">'+esc(p.content||'')+'</div>'
-    +imgHtml
-    +'<div class="pstats"><span>👍 <span id="lc-'+p.id+'">'+(p.likes||0)+'</span></span><span id="cc-'+p.id+'">0 komentar</span></div>'
-    +'<div class="pactrow">'
-    +'<button class="rbtn '+(isL?'liked':'')+'" id="lb-'+p.id+'" onclick="toggleLike(''+p.id+'')"><i class="fa fa-thumbs-up"></i> Suka</button>'
-    +'<button class="rbtn" onclick="toggleCom(''+p.id+'')"><i class="fa fa-comment"></i> Komentar</button>'
-    +'<button class="rbtn" onclick="sharePost(''+p.id+'',''+esc(p.userName||'')+'')"><i class="fa fa-share"></i> Bagikan</button>'
-    +'</div>'
-    +'<div class="csec" id="cs-'+p.id+'" style="display:none;">'
-    +'<div id="cl-'+p.id+'"></div>'
-    +'<div class="cinrow">'
-    +'<div class="av" style="width:32px;height:32px;font-size:12px;flex-shrink:0;background:'+myCol+';">'+myAv+'</div>'
-    +'<input class="cin" placeholder="Tulis komentar..." id="ci-'+p.id+'" onkeydown="if(event.key==='Enter')sendCom(''+p.id+'')"/>'
-    +'<button class="csend" onclick="sendCom(''+p.id+'')"><i class="fa fa-paper-plane"></i></button>'
-    +'</div></div>'
-    +'</div>';
+  var html = "<div class=\"pcard\" id=\"post-" + pid + "\">"
+    + "<div class=\"phead\">"
+    +   "<div class=\"pav\" style=\"background:" + col + ";\">" + av + "</div>"
+    +   "<div class=\"pmeta\">"
+    +     "<strong>" + esc(p.userName||"Anggota") + unitHtml + "</strong>"
+    +     "<span><i class=\"fa fa-earth-asia\" style=\"font-size:11px;\"></i> Publik &middot; " + fmt(p.createdAt) + "</span>"
+    +   "</div>"
+    +   "<div style=\"position:relative;margin-left:auto;\">"
+    +     "<button class=\"pmore\" onclick=\"togglePostMenu('menu-" + pid + "')\"><i class=\"fa fa-ellipsis\"></i></button>"
+    +     "<div id=\"menu-" + pid + "\" style=\"display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shm);min-width:160px;z-index:10;overflow:hidden;\">"
+    +       menuHtml
+    +     "</div>"
+    +   "</div>"
+    + "</div>"
+    + tagHtml
+    + "<div class=\"pbody\">" + esc(p.content||"") + "</div>"
+    + imgHtml
+    + "<div class=\"pstats\"><span>&#128077; <span id=\"lc-" + pid + "\">" + (p.likes||0) + "</span></span><span id=\"cc-" + pid + "\">0 komentar</span></div>"
+    + "<div class=\"pactrow\">"
+    +   "<button class=\"rbtn " + (isL?"liked":"") + "\" id=\"lb-" + pid + "\" onclick=\"toggleLike('" + pid + "')\"><i class=\"fa fa-thumbs-up\"></i> Suka</button>"
+    +   "<button class=\"rbtn\" onclick=\"toggleCom('" + pid + "')\"><i class=\"fa fa-comment\"></i> Komentar</button>"
+    +   "<button class=\"rbtn\" onclick=\"sharePost(this)\" data-pid=\"" + pid + "\"><i class=\"fa fa-share\"></i> Bagikan</button>"
+    + "</div>"
+    + "<div class=\"csec\" id=\"cs-" + pid + "\" style=\"display:none;\">"
+    +   "<div id=\"cl-" + pid + "\"></div>"
+    +   "<div class=\"cinrow\">"
+    +     "<div class=\"av\" style=\"width:32px;height:32px;font-size:12px;flex-shrink:0;background:" + myCol + ";\">" + myAv + "</div>"
+    +     "<input class=\"cin\" placeholder=\"Tulis komentar...\" id=\"ci-" + pid + "\" onkeydown=\"if(event.key==='Enter')sendCom('" + pid + "')\"/>"
+    +     "<button class=\"csend\" onclick=\"sendCom('" + pid + "')\"><i class=\"fa fa-paper-plane\"></i></button>"
+    +   "</div>"
+    + "</div>"
+    + "</div>";
+  return html;
 }
-
-function searchFeed(){
-  const q=document.getElementById('searchInput').value.toLowerCase().trim();
-  if(!q){renderPosts(allPosts,document.getElementById('feedPosts'));return;}
-  const filtered=allPosts.filter(p=>(p.userName||'').toLowerCase().includes(q)||(p.content||'').toLowerCase().includes(q));
-  renderPosts(filtered,document.getElementById('feedPosts'));
-}
-
-// ── LIKE ─────────────────────────────────────────────
-async function toggleLike(pid){
-  const btn=document.getElementById('lb-'+pid),lc=document.getElementById('lc-'+pid);
-  const isL=liked.has(pid),cur=parseInt(lc.textContent)||0;
-  if(isL){liked.delete(pid);btn.classList.remove('liked');lc.textContent=cur-1;}
-  else{liked.add(pid);btn.classList.add('liked');lc.textContent=cur+1;}
-  if(!ok()||ME?.id==='demo')return;
-  try{await apiPost('toggleLike',{postId:pid,userId:ME.id});}catch(e){}
-}
-
-// ── COMMENT ──────────────────────────────────────────
-async function toggleCom(pid){
-  const s=document.getElementById('cs-'+pid),open=s.style.display!=='none';
-  s.style.display=open?'none':'';
-  if(!open)await loadComs(pid);
-}
-async function loadComs(pid){
-  const l=document.getElementById('cl-'+pid);
-  l.innerHTML='<div style="font-size:13px;color:var(--muted);padding:4px 0;">Memuat…</div>';
-  try{
-    if(!ok()){l.innerHTML='<div style="font-size:13px;color:var(--muted);">Belum ada komentar.</div>';return;}
-    const d=await api('getComments',{postId:pid});
-    const cms=d.comments||[];
-    document.getElementById('cc-'+pid).textContent=cms.length+' komentar';
-    l.innerHTML=cms.length?cms.map(c=>`<div class="cm"><div class="cav" style="background:${aCol(c.userName||'')};">${ini(c.userName||'?')}</div><div><div class="cbub"><strong>${esc(c.userName||'Anggota')}</strong><p>${esc(c.content||'')}</p></div><div class="cmeta">${fmt(c.createdAt)}</div></div></div>`).join(''):'<div style="font-size:13px;color:var(--muted);">Belum ada komentar.</div>';
-  }catch(e){l.innerHTML='';}
-}
-async function sendCom(pid){
-  const input=document.getElementById('ci-'+pid),txt=input.value.trim();
-  if(!txt)return;input.value='';
-  const l=document.getElementById('cl-'+pid);
-  const tmp=document.createElement('div');tmp.className='cm';
-  tmp.innerHTML=`<div class="cav" style="background:${aCol(ME?.nama||'')};">${ME?.avatar||'?'}</div><div><div class="cbub"><strong>${esc(ME?.nama||'Saya')}</strong><p>${esc(txt)}</p></div><div class="cmeta">Baru saja</div></div>`;
-  l.appendChild(tmp);
-  if(!ok()||ME?.id==='demo')return;
-  try{
-    await apiPost('createComment',{postId:pid,content:txt,userId:ME.id,userName:ME.nama});
-    const d=await api('getComments',{postId:pid});
-    document.getElementById('cc-'+pid).textContent=(d.comments||[]).length+' komentar';
-  }catch(e){}
-}
-
-// ── SHARE ────────────────────────────────────────────
-function deletePost(pid){
-  document.querySelectorAll('[id^="menu-"]').forEach(function(m){m.style.display='none';});
-  if(!confirm('Hapus postingan ini?'))return;
-  var el=document.getElementById('post-'+pid);
-  if(el){el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(function(){el.remove();},300);}
+function deletePost(el){
+  var pid = el.getAttribute ? el.getAttribute("data-pid") : el;
+  document.querySelectorAll("[id^=\"menu-\"]").forEach(function(m){m.style.display="none";});
+  if(!confirm("Hapus postingan ini?"))return;
+  var card=document.getElementById("post-"+pid);
+  if(card){card.style.opacity="0";card.style.transition="opacity .3s";setTimeout(function(){card.remove();},300);}
   allPosts=allPosts.filter(function(p){return p.id!==pid;});
-  toast('🗑️ Postingan dihapus');
-  if(ok()&&ME&&ME.id!=='demo'){
-    apiPost('deletePost',{postId:pid,userId:ME.id}).catch(function(){});
+  toast("🗑️ Postingan dihapus");
+  if(ok()&&ME&&ME.id!=="demo"){
+    apiPost("deletePost",{postId:pid,userId:ME.id}).catch(function(){});
   }
 }
 
@@ -811,10 +770,13 @@ function editPost(pid){
 }
 
 
-function sharePost(pid, userName){
-  const url = window.location.href;
-  if(navigator.share){navigator.share({title:'Ners Face',text:'Postingan dari '+userName,url});}
-  else{navigator.clipboard.writeText(url).then(()=>toast('Link disalin!'));}
+function sharePost(el){
+  var pid  = el.getAttribute ? el.getAttribute("data-pid") : el;
+  var post = allPosts.find(function(p){return p.id===pid;});
+  var name = post ? (post.userName||"") : "";
+  var url  = window.location.href;
+  if(navigator.share){navigator.share({title:"Ners Face",text:"Postingan dari "+name,url:url});}
+  else{navigator.clipboard.writeText(url).then(function(){toast("Link disalin!");});}
 }
 
 // ── BUAT POST ─────────────────────────────────────────
