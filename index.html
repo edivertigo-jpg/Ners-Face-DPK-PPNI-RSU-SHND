@@ -621,7 +621,7 @@ function startApp(){
   document.getElementById('authScreen').classList.remove('on');
   document.getElementById('appShell').style.display='';
   const av=ME.avatar||ini(ME.nama||''), col=aCol(ME.nama||'');
-  ['navAv','sideAv','pbAv','mAv'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent=av;e.style.background=col;});
+  ['navAv','sideAv','pbAv','mAv'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent=av;e.style.background=col;}});
   const sn=document.getElementById('sideName');if(sn)sn.textContent=ME.nama||'–';
   const su=document.getElementById('sideUnit');if(su)su.textContent=ME.unitKerja||'–';
   const mn=document.getElementById('mName');if(mn)mn.textContent=ME.nama||'–';
@@ -662,43 +662,55 @@ function getDemoP(){return[
 function renderPosts(posts,c){c.innerHTML=posts.map(p=>buildPost(p)).join('');}
 
 function buildPost(p){
-  const av=ini(p.userName||'?'),col=aCol(p.userName||'?'),isL=liked.has(p.id);
-  const imgHtml=p.imageUrl?`<img class="pimg" src="${esc(p.imageUrl)}" alt="foto" onclick="openViewer('${esc(p.imageUrl)}')"/>`:'';
-  return `<div class="pcard" id="post-${p.id}">
-    <div class="phead">
-      <div class="pav" style="background:${col};">${av}</div>
-      <div class="pmeta">
-        <strong>${esc(p.userName||'Anggota')}${p.unitKerja?`<span class="unit-badge">${esc(p.unitKerja)}</span>`:''}</strong>
-        <span><i class="fa fa-earth-asia" style="font-size:11px;"></i> Publik · ${fmt(p.createdAt)}</span>
-      </div>
-      <div style="position:relative;margin-left:auto;">
-        <button class="pmore" onclick="togglePostMenu('menu-${p.id}')" ><i class="fa fa-ellipsis"></i></button>
-        <div id="menu-${p.id}" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shm);min-width:160px;z-index:10;overflow:hidden;">
-          ${ME&&(ME.id===p.userId||ME.id==='demo')?`
-          <div onclick="editPost('${p.id}')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''"><i class="fa fa-pen" style="color:var(--red);width:16px;margin-right:8px;"></i>Sunting</div>
-          <div onclick="deletePost('${p.id}')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#e4194a;" onmouseover="this.style.background='#fde8ef'" onmouseout="this.style.background=''"><i class="fa fa-trash" style="width:16px;margin-right:8px;"></i>Hapus</div>
-          `:'<div style="padding:12px 16px;font-size:14px;color:var(--muted);">Bukan postingan Anda</div>'}
-        </div>
-      </div>
-    </div>
-    ${p.tag?`<span class="ptag"><i class="fa fa-tag"></i> ${esc(p.tag)}</span>`:''}
-    <div class="pbody">${esc(p.content||'')}</div>
-    ${imgHtml}
-    <div class="pstats"><span>👍 <span id="lc-${p.id}">${p.likes||0}</span></span><span id="cc-${p.id}">0 komentar</span></div>
-    <div class="pactrow">
-      <button class="rbtn ${isL?'liked':''}" id="lb-${p.id}" onclick="toggleLike('${p.id}')"><i class="fa fa-thumbs-up"></i> Suka</button>
-      <button class="rbtn" onclick="toggleCom('${p.id}')"><i class="fa fa-comment"></i> Komentar</button>
-      <button class="rbtn" onclick="sharePost('${p.id}','${esc(p.userName||'')}')"><i class="fa fa-share"></i> Bagikan</button>
-    </div>
-    <div class="csec" id="cs-${p.id}" style="display:none;">
-      <div id="cl-${p.id}"></div>
-      <div class="cinrow">
-        <div class="av" style="width:32px;height:32px;font-size:12px;flex-shrink:0;background:${aCol(ME?.nama||'')};">${ME?.avatar||'?'}</div>
-        <input class="cin" placeholder="Tulis komentar…" id="ci-${p.id}" onkeydown="if(event.key==='Enter')sendCom('${p.id}')"/>
-        <button class="csend" onclick="sendCom('${p.id}')"><i class="fa fa-paper-plane"></i></button>
-      </div>
-    </div>
-  </div>`;
+  var av    = ini(p.userName||'?');
+  var col   = aCol(p.userName||'?');
+  var isL   = liked.has(p.id);
+  var isOwn = ME && (ME.id === p.userId || ME.id === 'demo');
+  var myAv  = ME ? (ME.avatar || ini(ME.nama||'?')) : '?';
+  var myCol = ME ? aCol(ME.nama||'') : '#ccc';
+
+  var imgHtml = p.imageUrl
+    ? '<img class="pimg" src="'+p.imageUrl+'" alt="foto" onclick="openViewer(this.src)"/>'
+    : '';
+
+  var tagHtml = p.tag
+    ? '<span class="ptag"><i class="fa fa-tag"></i> '+esc(p.tag)+'</span>'
+    : '';
+
+  var unitHtml = p.unitKerja
+    ? '<span class="unit-badge">'+esc(p.unitKerja)+'</span>'
+    : '';
+
+  var menuItems = isOwn
+    ? '<div onclick="editPost(''+p.id+''')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''"><i class="fa fa-pen" style="color:var(--red);margin-right:8px;"></i>Sunting</div><div onclick="deletePost(''+p.id+'')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#e4194a;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#fde8ef'" onmouseout="this.style.background=''"><i class="fa fa-trash" style="margin-right:8px;"></i>Hapus</div>'
+    : '<div style="padding:12px 16px;font-size:13px;color:var(--muted);">Bukan postingan Anda</div>';
+
+  return '<div class="pcard" id="post-'+p.id+'">'
+    +'<div class="phead">'
+    +'<div class="pav" style="background:'+col+';">'+av+'</div>'
+    +'<div class="pmeta"><strong>'+esc(p.userName||'Anggota')+unitHtml+'</strong>'
+    +'<span><i class="fa fa-earth-asia" style="font-size:11px;"></i> Publik &middot; '+fmt(p.createdAt)+'</span></div>'
+    +'<div style="position:relative;margin-left:auto;">'
+    +'<button class="pmore" onclick="togglePostMenu('menu-'+p.id+'')"><i class="fa fa-ellipsis"></i></button>'
+    +'<div id="menu-'+p.id+'" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shm);min-width:160px;z-index:10;overflow:hidden;">'+menuItems+'</div>'
+    +'</div></div>'
+    +tagHtml
+    +'<div class="pbody">'+esc(p.content||'')+'</div>'
+    +imgHtml
+    +'<div class="pstats"><span>👍 <span id="lc-'+p.id+'">'+(p.likes||0)+'</span></span><span id="cc-'+p.id+'">0 komentar</span></div>'
+    +'<div class="pactrow">'
+    +'<button class="rbtn '+(isL?'liked':'')+'" id="lb-'+p.id+'" onclick="toggleLike(''+p.id+'')"><i class="fa fa-thumbs-up"></i> Suka</button>'
+    +'<button class="rbtn" onclick="toggleCom(''+p.id+'')"><i class="fa fa-comment"></i> Komentar</button>'
+    +'<button class="rbtn" onclick="sharePost(''+p.id+'',''+esc(p.userName||'')+'')"><i class="fa fa-share"></i> Bagikan</button>'
+    +'</div>'
+    +'<div class="csec" id="cs-'+p.id+'" style="display:none;">'
+    +'<div id="cl-'+p.id+'"></div>'
+    +'<div class="cinrow">'
+    +'<div class="av" style="width:32px;height:32px;font-size:12px;flex-shrink:0;background:'+myCol+';">'+myAv+'</div>'
+    +'<input class="cin" placeholder="Tulis komentar..." id="ci-'+p.id+'" onkeydown="if(event.key==='Enter')sendCom(''+p.id+'')"/>'
+    +'<button class="csend" onclick="sendCom(''+p.id+'')"><i class="fa fa-paper-plane"></i></button>'
+    +'</div></div>'
+    +'</div>';
 }
 
 function searchFeed(){
@@ -751,6 +763,18 @@ async function sendCom(pid){
 }
 
 // ── SHARE ────────────────────────────────────────────
+function deletePost(pid){
+  document.querySelectorAll('[id^="menu-"]').forEach(function(m){m.style.display='none';});
+  if(!confirm('Hapus postingan ini?'))return;
+  var el=document.getElementById('post-'+pid);
+  if(el){el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(function(){el.remove();},300);}
+  allPosts=allPosts.filter(function(p){return p.id!==pid;});
+  toast('🗑️ Postingan dihapus');
+  if(ok()&&ME&&ME.id!=='demo'){
+    apiPost('deletePost',{postId:pid,userId:ME.id}).catch(function(){});
+  }
+}
+
 function togglePostMenu(menuId){
   // Tutup semua menu lain dulu
   document.querySelectorAll('[id^="menu-"]').forEach(m=>{
@@ -786,17 +810,6 @@ function editPost(pid){
   }
 }
 
-async function deletePost(pid){
-  document.querySelectorAll('[id^="menu-"]').forEach(m=>m.style.display='none');
-  if(!confirm('Hapus postingan ini?'))return;
-  const el=document.getElementById('post-'+pid);
-  if(el){el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300);}
-  allPosts=allPosts.filter(p=>p.id!==pid);
-  toast('🗑️ Postingan dihapus');
-  if(ok()&&ME?.id!=='demo'){
-    try{await apiPost('deletePost',{postId:pid,userId:ME.id});}catch(e){}
-  }
-}
 
 function sharePost(pid, userName){
   const url = window.location.href;
@@ -957,12 +970,12 @@ async function loadUsers(){
 
 function renderOnline(){
   const c=document.getElementById('onlineUsers');
-  c.innerHTML=allUsers.slice(0,6).map(u=>{
+  c.innerHTML=allUsers.slice(0,6).map((u,i)=>{
     const avStyle=u.photoUrl
       ? `background-image:url(${u.photoUrl});background-size:cover;background-position:center;`
       : `background:${aCol(u.nama||'')};`;
     const avText=u.photoUrl?'':ini(u.nama||'?');
-    return `<div style="display:flex;align-items:center;gap:10px;padding:6px;border-radius:8px;cursor:pointer;" onclick="viewMemberProfile(${JSON.stringify(u).replace(/"/g,'&quot;')})" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''">
+    return `<div style="display:flex;align-items:center;gap:10px;padding:6px;border-radius:8px;cursor:pointer;" onclick="viewMemberProfile(allUsers[${i}])" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''">
       <div style="position:relative;">
         <div class="av" style="width:34px;height:34px;font-size:12px;${avStyle}">${avText}</div>
         <div style="position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:var(--online);border:2px solid #fff;"></div>
@@ -974,7 +987,7 @@ function renderOnline(){
 
 function renderMembers(){
   const list=document.getElementById('memberList');
-  list.innerHTML=allUsers.map(u=>`
+  list.innerHTML=allUsers.map((u,i)=>`
     <div style="background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;box-shadow:var(--sh);transition:.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
       <div class="av" style="width:56px;height:56px;font-size:20px;flex-shrink:0;background:${aCol(u.nama||'')};">${ini(u.nama||'?')}</div>
       <div>
@@ -983,10 +996,10 @@ function renderMembers(){
         <div style="font-size:11px;color:var(--muted);">${u.status?esc(u.status):''}</div>
       </div>
       <div style="display:flex;gap:6px;width:100%;margin-top:4px;">
-        <button onclick="viewMemberProfile(${JSON.stringify(u)})" style="flex:1;padding:7px 0;border:1.5px solid var(--red);background:transparent;color:var(--red);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;" onmouseover="this.style.background='var(--light)'" onmouseout="this.style.background='transparent'">
+        <button onclick="viewMemberProfile(allUsers[${i}])" style="flex:1;padding:7px 0;border:1.5px solid var(--red);background:transparent;color:var(--red);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;" onmouseover="this.style.background='var(--light)'" onmouseout="this.style.background='transparent'">
           <i class="fa fa-user"></i> Profil
         </button>
-        <button onclick="startChat(${JSON.stringify(u)})" style="flex:1;padding:7px 0;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;" onmouseover="this.style.background='var(--dark)'" onmouseout="this.style.background='var(--red)'">
+        <button onclick="startChat(allUsers[${i}])" style="flex:1;padding:7px 0;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;" onmouseover="this.style.background='var(--dark)'" onmouseout="this.style.background='var(--red)'">
           <i class="fa fa-message"></i> Chat
         </button>
       </div>
@@ -997,7 +1010,9 @@ function filterMembers(){
   const q=document.getElementById('memberSearch').value.toLowerCase().trim();
   const filtered=q?allUsers.filter(u=>(u.nama||'').toLowerCase().includes(q)||(u.unitKerja||'').toLowerCase().includes(q)):allUsers;
   const list=document.getElementById('memberList');
-  list.innerHTML=filtered.map(u=>`
+  // Simpan filtered ke window agar onclick bisa akses by index
+  window._filteredUsers = filtered;
+  list.innerHTML=filtered.map((u,i)=>`
     <div style="background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;box-shadow:var(--sh);transition:.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
       <div class="av" style="width:56px;height:56px;font-size:20px;background:${aCol(u.nama||'')};">${ini(u.nama||'?')}</div>
       <div>
@@ -1005,10 +1020,10 @@ function filterMembers(){
         <div style="font-size:12px;color:var(--muted);">${esc(u.unitKerja||'–')}</div>
       </div>
       <div style="display:flex;gap:6px;width:100%;">
-        <button onclick="viewMemberProfile(${JSON.stringify(u)})" style="flex:1;padding:7px 0;border:1.5px solid var(--red);background:transparent;color:var(--red);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;" onmouseover="this.style.background='var(--light)'" onmouseout="this.style.background='transparent'">
+        <button onclick="viewMemberProfile(window._filteredUsers[${i}])" style="flex:1;padding:7px 0;border:1.5px solid var(--red);background:transparent;color:var(--red);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;" onmouseover="this.style.background='var(--light)'" onmouseout="this.style.background='transparent'">
           <i class="fa fa-user"></i> Profil
         </button>
-        <button onclick="startChat(${JSON.stringify(u)})" style="flex:1;padding:7px 0;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;" onmouseover="this.style.background='var(--dark)'" onmouseout="this.style.background='var(--red)'">
+        <button onclick="startChat(window._filteredUsers[${i}])" style="flex:1;padding:7px 0;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;" onmouseover="this.style.background='var(--dark)'" onmouseout="this.style.background='var(--red)'">
           <i class="fa fa-message"></i> Chat
         </button>
       </div>
@@ -1156,7 +1171,8 @@ async function changePassword(){
 let currentChatUser = null;
 
 function viewMemberProfile(u) {
-  if (typeof u === 'string') u = JSON.parse(u);
+  if (!u) return;
+  if (typeof u === 'string') { try { u = JSON.parse(u); } catch(e) { return; } }
   currentChatUser = u;
   const col = aCol(u.nama||'');
   const av  = document.getElementById('mpAvatar');
@@ -1188,7 +1204,8 @@ function startChatFromProfile() {
 let chatHistory = {}; // { userId: [{from, text, time}] }
 
 function startChat(u) {
-  if (typeof u === 'string') u = JSON.parse(u);
+  if (!u) return;
+  if (typeof u === 'string') { try { u = JSON.parse(u); } catch(e) { return; } }
   currentChatUser = u;
   const col = aCol(u.nama||'');
   const av  = document.getElementById('chatAvatar');
@@ -1284,7 +1301,7 @@ function loadChatHistories() {
 window.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{const l=document.getElementById('pageLoader');l.style.opacity='0';setTimeout(()=>l.style.display='none',400);},1400);
   const saved=localStorage.getItem('nersface_user');
-  if(saved){try{ME=JSON.parse(saved);document.getElementById('authScreen').classList.remove('on');startApp();}catch(e){localStorage.removeItem('nersface_user');}
+  if(saved){try{ME=JSON.parse(saved);document.getElementById('authScreen').classList.remove('on');startApp();}catch(e){localStorage.removeItem('nersface_user');}}
   document.querySelectorAll('.ntab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.ntab').forEach(x=>x.classList.remove('on'));t.classList.add('on');},{passive:true}));
   document.getElementById('lPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 });
