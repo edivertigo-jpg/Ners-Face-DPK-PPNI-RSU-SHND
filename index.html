@@ -2,6 +2,19 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8"/>
+  <script>
+    // Paksa hapus semua Service Worker dan cache lama
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistrations().then(function(regs){
+        regs.forEach(function(r){r.unregister();});
+      });
+    }
+    if('caches' in window){
+      caches.keys().then(function(keys){
+        keys.forEach(function(k){caches.delete(k);});
+      });
+    }
+  </script>
   <link rel="icon" href="icons/favicon.ico"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ners Face – DPK PPNI SHND</title>
